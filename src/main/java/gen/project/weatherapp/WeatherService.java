@@ -1,7 +1,6 @@
 package gen.project.weatherapp;
 
 import java.time.Instant;
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,7 +24,8 @@ public class WeatherService {
                 request.getSensorId(),
                 request.getTime(),
                 request.getTemperature(),
-                request.getHumidity()
+                request.getHumidity(),
+                request.getWindspeed()
         );
         return weatherRepository.save(reading);
     }
@@ -95,24 +95,44 @@ public class WeatherService {
     }
 
     private WeatherReading aggregate(String sensorId, List<WeatherReading> readings, String metric, String stat) {
-        BigDecimal temperature = metric == null || metric.equals("temperature")
+        Float temperature = metric == null || metric.equals("temperature")
                 ? calculate(readings, WeatherReading::getTemperature, stat) : null;
-        BigDecimal humidity = metric == null || metric.equals("humidity")
+        Float humidity = metric == null || metric.equals("humidity")
                 ? calculate(readings, WeatherReading::getHumidity, stat) : null;
-        return new WeatherReading(sensorId, null, temperature, humidity);
+        Float windspeed = metric == null || metric.equals("windspeed")
+                ? calculate(readings, WeatherReading::getWindspeed, stat) : null;
+        return new WeatherReading(sensorId, null, temperature, humidity, windspeed);
     }
 
-    private BigDecimal calculate(List<WeatherReading> readings, Function<WeatherReading, BigDecimal> value,
-            String stat) {
-        if (stat.equals("min")) {
-            return readings.stream().map(value).min(BigDecimal::compareTo).orElse(null);
-        }
-        if (stat.equals("max")) {
-            return readings.stream().map(value).max(BigDecimal::compareTo).orElse(null);
-        }
-        BigDecimal sum = readings.stream().map(value).reduce(BigDecimal.ZERO, BigDecimal::add);
-        return sum.divide(BigDecimal.valueOf(readings.size()), 2, RoundingMode.HALF_UP);
+private Float calculate(List<WeatherReading> readings,
+        Function<WeatherReading, Float> value,
+        String stat) {
+
+    if ("min".equals(stat)) {
+        return readings.stream()
+                .map(value)
+                .min(Float::compare)
+                .orElse(null);
     }
+
+    if ("max".equals(stat)) {
+        return readings.stream()
+                .map(value)
+                .max(Float::compare)
+                .orElse(null);
+    }
+
+    if (readings.isEmpty()) {
+        return null;
+    }
+
+    Float sum = readings.stream()
+            .map(value)
+            .reduce(0f, Float::sum);
+
+    return Math.round((sum / readings.size()) * 100f) / 100f;
+}
+
 
     private WeatherReading selectMetric(WeatherReading reading, String metric) {
         if (metric == null) {
@@ -120,6 +140,7 @@ public class WeatherService {
         }
         return new WeatherReading(reading.getSensorId(), reading.getTime(),
                 metric.equals("temperature") ? reading.getTemperature() : null,
-                metric.equals("humidity") ? reading.getHumidity() : null);
+                metric.equals("humidity") ? reading.getHumidity() : null,
+                metric.equals("windspeed") ? reading.getWindspeed() : null);
     }
 }

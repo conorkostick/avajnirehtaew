@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import java.math.BigDecimal;
 import java.time.Instant;
 
 public class WeatherRequest {
@@ -18,10 +17,13 @@ public class WeatherRequest {
     private Instant time;
 
     @NotNull(message = "temperature is required")
-    private BigDecimal temperature;
+    private Float temperature;
 
     @NotNull(message = "humidity is required")
-    private BigDecimal humidity;
+    private Float humidity;
+
+    @NotNull(message = "windspeed is required")
+    private Float windspeed;
 
     public String getSensorId() {
         return sensorId;
@@ -39,19 +41,27 @@ public class WeatherRequest {
         this.time = time;
     }
 
-    public BigDecimal getTemperature() {
+    public Float getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(BigDecimal temperature) {
+    public void setTemperature(Float temperature) {
         this.temperature = temperature;
     }
 
-    public BigDecimal getHumidity() {
+    public Float getHumidity() {
         return humidity;
     }
 
-    public void setHumidity(BigDecimal humidity) {
+    public void setHumidity(Float humidity) {
         this.humidity = humidity;
+    }
+
+    public Float getWindspeed() {
+        return windspeed;
+    }
+
+    public void setWindspeed(Float windspeed) {
+        this.windspeed = windspeed;
     }
 }
