@@ -16,19 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-// make temperature and humidity enums? - done
-// also same for avg, max and min - done
-// change Big Decimal or change DB schema to take in appropriate values - done
-// implement windspeed - done
-
-// Need to make POST fields manditory
-// Need to create input validation
-// Need to handle error messages better
-// Need to manage API responses better
-
-// limitations: only one stat or metric per get request
-//                post requests must have all values 
-
 @RestController
 @RequestMapping("/api/v1")
 public class WeatherController {
